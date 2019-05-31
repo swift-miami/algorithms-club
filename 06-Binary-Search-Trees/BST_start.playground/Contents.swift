@@ -116,3 +116,72 @@ var exampleTree: BinarySearchTree<Int> {
 
 exampleTree.contains(1110)
 [0].count
+
+/* Convert sorted array to a Binary Search Tree */
+class TreeNode {
+    var val: Int
+    var left: TreeNode?
+    var right: TreeNode?
+    
+    init(_ val: Int) {
+        self.val = val
+    }
+}
+
+extension TreeNode: CustomStringConvertible {
+    
+    public var description: String {
+        return diagram(for: self)
+    }
+    
+    private func diagram(for node: TreeNode?,
+                         _ top: String = "",
+                         _ root: String = "",
+                         _ bottom: String = "") -> String {
+        guard let node = node else {
+            return root + "nil\n"
+        }
+        if node.left == nil && node.right == nil {
+            return root + "\(node.val)\n"
+        }
+        return diagram(for: node.right, top + " ", top + "┌──", top + "│ ")
+            + root + "\(node.val)\n"
+            + diagram(for: node.left, bottom + "│ ", bottom + "└──", bottom + " ")
+    }
+}
+
+func sortedArrayToBSTSlicing(_ nums: [Int]) -> TreeNode? {
+    if nums.isEmpty { return nil }
+
+    let mid = nums.count / 2
+    let num = nums[mid]
+
+    let node = TreeNode(num)
+    node.left = sortedArrayToBST( Array( nums[0..<mid] ))
+    node.right = sortedArrayToBST( Array( nums[(mid + 1)..<nums.count] ))
+    return node
+}
+
+func sortedArrayToBST(_ nums: [Int]) -> TreeNode? {
+    return convertToBST(nums, 0, nums.count - 1)
+}
+
+private func convertToBST(_ nums: [Int], _ minIndex: Int, _ maxIndex: Int) -> TreeNode? {
+    guard minIndex <= maxIndex else { return nil }
+    
+    let midIndex = maxIndex - (maxIndex - minIndex) / 2
+    let val = nums[midIndex]
+    
+    let node = TreeNode(val)
+    node.left = convertToBST(nums, minIndex, midIndex - 1)
+    node.right = convertToBST(nums, midIndex + 1, maxIndex)
+    return node
+}
+
+let arr = [0, 1, 2, 4, 5, 6, 7, 8]
+
+let treeSliced = sortedArrayToBSTSlicing(arr)
+print(treeSliced!)
+
+let tree = sortedArrayToBST(arr)
+print(tree!)
