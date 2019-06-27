@@ -2,16 +2,24 @@
 
 AVL is named after Georgy Adelson-Velsky and Evgenii Landis who created the first self-balancing tree. In the BST lesson a BST was built but had to be built in a balanced form from the start. An AVL will balance itself.
 
-Types of Balance:
-  - Perfect balance: This is the ideal form of an AVL Tree. Every level of the tree if filled with nodes from top to bottom including all tyhe leaves. This isn't easy to achieve because the data being inserted must be a specific size.
-  ![Perfect](assets/perfect_balance.png)
-  - Good Enough Balance: This will be a degraded version of the Perfect Balance tree and will not the have the same performance. To be "Good Enough" every level must be filled except the bottom level.
-  ![Good Enough](assets/good_enough.png)
-  - Unbalanced
-  ![Unbalanced](assets/unbalanced.png)
+## Balance
 
+### Perfect Balance
 
-#### Balance Factor
+This is the ideal form of an AVL Tree. Every level of the tree if filled with nodes from top to bottom including all tyhe leaves. This isn't easy to achieve because the data being inserted must be a specific size.
+![Perfect](assets/perfect_balance.png)
+
+### Good Enough Balance
+
+This will be a degraded version of the Perfect Balance tree and will not the have the same performance. To be "Good Enough" every level must be filled except the bottom level.
+![Good Enough](assets/good_enough.png)
+
+### Unbalanced
+
+![Unbalanced](assets/unbalanced.png)
+
+## Balance Factor
+
 Balance factor is a computed value of the difference between the height of the left child and the right child. If after any modification in the tree, the balance factor becomes less than −1 or greater than +1, the subtree rooted at this node is unbalanced, and a rotation is needed.
 
 ![Balance Factor](assets/balanceFactor.png)
@@ -37,19 +45,24 @@ public var rightHeight: Int {
 }
 ```
 
-#### Rotation
+## Rotation
+
 There are 4 types of rotation:
-  - Left Rotation
-  - Right Rotation
-  - Left-Right Rotation
-  - Right-Left Rotation
+
+- Left Rotation
+- Right Rotation
+- Left-Right Rotation
+- Right-Left Rotation
 
 ![Rotation](assets/rotations.gif)
+
+University of San Franssisco has a great tool for seeing how rotations work in practice.
+[AVL Trees](https://www.cs.usfca.edu/~galles/visualization/AVLtree.html)
 
 Note: After the rotation that the in-order traversal has not changed & the depth of the tree is reduced by 1 level
 
 
-##### Left Rotation
+### Left Rotation
 
 ![Left Rotation](assets/leftRotation.png)
 
@@ -60,7 +73,7 @@ private func leftRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
   let pivot = node.rightChild!
 
   // Take the pivot's left child and set it to the node being rotated's
-  // Left child ( if nil it just sets the node's right child to nil)
+  // Right child ( if nil it just sets the node's right child to nil)
   node.rightChild = pivot.leftChild
 
   // Move the node being rotated to the left child of the pivot
@@ -76,7 +89,8 @@ private func leftRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
 }
 ```
 
-##### Right Rotation
+### Right Rotation
+
 Right rotation is the exact opposit of the left rotation
 ![Right Rotation](assets/rightRotation.png)
 
@@ -87,7 +101,7 @@ private func rightRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
   let pivot = node.leftChild!
 
   // Take the pivot's right child (even if nil) and set it to the rotated node's
-  // right child
+  // left child
   node.leftChild = pivot.rightChild
 
   // Move the node being rotated to the right child of the pivot
@@ -102,7 +116,8 @@ private func rightRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
 }
 ```
 
-#### Right-Left Rotation
+### Right-Left Rotation
+
 In previous examples the rotation was being done on a node that was all left or all right child nodes. A left-right or right-left will be a 2-step rotation.
 
 ![Right-Left](assets/rightLeftRotation.png)
@@ -123,7 +138,8 @@ private func rightLeftRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
 }
 ```
 
-#### Left-Right Rotation
+### Left-Right Rotation
+
 Opposite of right-left rotation
 
 ![Left-Right](assets/leftRightRotation.png)
@@ -142,12 +158,13 @@ private func leftRightRotate(_ node: AVLNode<Element>) -> AVLNode<Element> {
 }
 ```
 
-#### Balance Factor
+## Balance Factor Operations
 
-There are 3 situations to handle
-  - A `balanceFactor` of 2 means the left child has more nodes than the right (right or right-left rotation)
-  - A `balanceFactor` of -2 means the right child has more nodes (left or left-right rotation)
-  - Default, the tree is balanced
+There are 3 situations to handle:
+
+- A `balanceFactor` of 2 means the left child has more nodes than the right (right or right-left rotation)
+- A `balanceFactor` of -2 means the right child has more nodes (left or left-right rotation)
+- Default, the tree is balanced
 
 ```swift
 private func balanced(_ node: AVLNode<Element>) -> AVLNode<Element> {
@@ -172,7 +189,7 @@ private func balanced(_ node: AVLNode<Element>) -> AVLNode<Element> {
     }
 ```
 
-#### Insert
+### Insert
 
 All the previously built functions were private, so now they need to utilized. The only reason the tree should be modified is after an insert or removal.
 
