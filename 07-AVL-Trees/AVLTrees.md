@@ -58,7 +58,6 @@ There are 4 types of rotation:
 
 University of San Franssisco has a great tool for seeing how rotations work in practice.
 [AVL Trees](https://www.cs.usfca.edu/~galles/visualization/AVLtree.html)
-
 Note: After the rotation that the in-order traversal has not changed & the depth of the tree is reduced by 1 level
 
 
@@ -223,3 +222,43 @@ private func insert(from node: AVLNode<Element>?, value: Element) -> AVLNode<Ele
     return balanceNode
 }
 ```
+
+### Remove
+
+```swift
+  private func remove(node: AVLNode<Element>?, value: Element) -> AVLNode<Element>? {
+    guard let node = node else {
+      return nil
+    }
+
+    if value == node.value {
+
+      if node.leftChild == nil && node.rightChild == nil {
+        return nil
+      }
+
+      if node.leftChild == nil {
+        return node.rightChild
+      }
+
+      if node.rightChild == nil {
+        return node.leftChild
+      }
+
+      node.value = node.rightChild!.min.value
+      node.rightChild = remove(node: node.rightChild, value: node.value)
+
+    } else if value < node.value {
+
+      node.leftChild = remove(node: node.leftChild, value: value)
+    } else {
+
+      node.rightChild = remove(node: node.rightChild, value: value)
+    }
+
+    let balancedNode    = balanced(node)
+    balancedNode.height = max(balancedNode.leftHeight, balancedNode.rightHeight) + 1
+    
+    return balancedNode
+  }
+  ```
