@@ -50,3 +50,175 @@ public class Trie<CollectionType: Collection>  where CollectionType.Element: Has
   public init() {}
 }
 ```
+
+### Insert
+```swift
+/// Complexity `O(k)` where `k` is the length of the collection being inserted
+extension Trie {
+  public func insert(_ collection: CollectionType) {
+
+    // Tracks traversal progress starting @ root node
+    var current = root
+
+    // Iterates over collection's elements
+    for element in collection {
+
+      // Checks if the current node already contains
+      // the element being inserted
+      if current.children[element] == nil {
+
+        // If element does not exist, create a new node and 
+        // attach to the parent
+        current.children[element] = Node(key: element, parent: current)
+      }
+
+      // Move current node to the next node
+      current = current.children[element]!
+    }
+
+    // Sets `isTerminating` to true to signal end of the collection
+    current.isTerminating = true
+  }
+}
+```
+
+### Contains
+```swift
+extension Trie {
+  public func contains(_ collection: CollectionType) -> Bool {
+
+    // Tracks the current node
+    var current = root
+
+    for element in collection {
+      // Checks if the current value being searched for exists in node's dictionary
+      guard let child = current.children[element] else { return false }
+
+      // Sets the next node to the child
+      current = child
+    }
+
+    // If the current node isTerminating it signals that the string
+    // Does exist in the trie
+    return current.isTerminating
+  }
+}
+```
+
+### Remove
+```swift
+extension Trie {
+  public func remove(_ collection: CollectionType) {
+    // Set current node in iteration cycle to the root
+    var current = root
+
+    // Iterate over elements in collection to be removed
+    for element in collection {
+
+      // Verifies that the element being removed exists in the trie
+      guard let child = current.children[element] else {
+        return
+      }
+
+      // Sets current node to child node
+      current = child
+    }
+
+    // Checks if the collection is terminated
+    guard current.isTerminating else {
+      return
+    }
+
+    // Sets isTerminating to false, so next step can remove node
+    current.isTerminating = false
+
+    // While the current node has a parent
+    while let parent = current.parent,
+    // And the current node has children and is not terminating
+    current.children.isEmpty && !current.isTerminating {
+
+      // Note: The reason for checking children.isEmpty & !current.isTerminating
+      // is that we don't want to remove values that might belong to another
+      // Collection in the trie
+
+      // Set the value being removed's children to nil
+      parent.children[current.key!] = nil
+
+      // Set the current node to the parent
+      current = parent
+    }
+  }
+}
+```
+
+#### Remove Example
+```swift
+example(of: "remove") {
+  let trie = Trie<String>()
+  trie.insert("cut")
+  trie.insert("cute")
+  
+  print("\n*** Before removing ***")
+  assert(trie.contains("cut"))
+  print("\"cut\" is in the trie")
+  assert(trie.contains("cute"))
+  print("\"cute\" is in the trie")
+  
+  print("\n*** After removing cut ***")
+  trie.remove("cut")
+  assert(!trie.contains("cut"))
+  assert(trie.contains("cute"))
+  print("\"cute\" is still in the trie")
+}
+
+```
+
+### Prefix Matching
+```swift
+public extension Trie where CollectionType: RangeReplaceableCollection {
+  func collections(startingWith prefix: CollectionType) -> [CollectionType] {
+
+    // Verify trie contains the prefix
+    var current = root
+
+    // Iterate over elements in the prefix
+    for element in prefix {
+
+      // If the current node's children does not contain the element
+      // return empty array
+      guard let child = current.children[element] else { return [] }
+
+      // If the current node's children does contain the element
+      // Set the current node to the child for the next iteration
+      current = child
+    }
+
+    return collection(startingWith: prefix, after: current)
+  } 
+
+  private func collection(startingWith: prefix: CollectionType, after node: Node) -> [CollectionType] {
+
+    // Instantiate blank collection for results
+    var results: [CollectionType] = []
+
+    // If the node isTerminating add it to the results
+    if node.isTerminating { results.append(prefix) }
+
+    // Iterate over the children of the node
+    for child in node.children.values {
+
+      // Set prefix to a mutable value
+      var prefix = prefix
+
+      // Append the child's key to the prefix
+      prefix.append(child.key!)
+
+      // Recurse down the chain to the child's value
+      results.append(contentsOf: collections(startingWith: prefix, after: child))
+    }
+
+    return results
+  }
+
+}
+```
