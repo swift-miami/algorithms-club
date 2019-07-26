@@ -66,7 +66,10 @@ public extension Trie where CollectionType: RangeReplaceableCollection {
   private func collections(startingWith prefix: CollectionType, after node: Node) -> [CollectionType] {
     
     // 1
-    var results: [CollectionType] = []
+    print("Collection: \(prefix)")
+    var results: [CollectionType] = [] {
+        didSet { print("Results: \(results)") }
+    }
     
     if node.isTerminating {
       results.append(prefix)
@@ -74,7 +77,10 @@ public extension Trie where CollectionType: RangeReplaceableCollection {
     
     // 2
     for child in node.children.values {
-      var prefix = prefix
+        var prefix = prefix {
+            didSet { print("Prefix: \(prefix)")}
+        }
+
       prefix.append(child.key!)
       results.append(contentsOf: collections(startingWith: prefix, after: child))
     }
